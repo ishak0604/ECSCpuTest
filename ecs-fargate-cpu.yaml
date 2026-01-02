@@ -28,11 +28,11 @@ Resources:
   ECSCluster:
     Type: AWS::ECS::Cluster
     Properties:
-      HealthCheckGracePeriodSeconds: 60
       ClusterName: cpu-test-cluster-v2
       ClusterSettings:
         - Name: containerInsights
           Value: enabled
+
 
   # -----------------------------
   # IAM Role
@@ -68,7 +68,7 @@ Resources:
   TaskSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription:  
+      GroupDescription: Allow traffic from ALB to ECS tasks
       VpcId: !Ref VpcId
       SecurityGroupIngress:
         - IpProtocol: tcp
@@ -131,7 +131,7 @@ Resources:
           LogConfiguration:
             LogDriver: awslogs
             Options:
-              awslogs-group: /ecs/cpu-test-v2
+              awslogs-group: !Sub /ecs/${AWS::StackName}
               awslogs-region: !Ref AWS::Region
               awslogs-stream-prefix: ecs
 
