@@ -27,5 +27,5 @@ phases:
 
 artifacts:
   files:
-    - buildspec.yml
+    - ecs-fargate-cpu.yaml
     - imageDetail.json
