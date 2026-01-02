@@ -16,11 +16,13 @@ Resources:
   # -----------------------------
   # CloudWatch Logs
   # -----------------------------
-  LogGroup:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: !Sub /ecs/${AWS::StackName}
-      RetentionInDays: 7
+  LogConfiguration:
+    LogDriver: awslogs
+    Options:
+      awslogs-group: !Sub /ecs/${AWS::StackName}
+      awslogs-region: !Ref AWS::Region
+      awslogs-stream-prefix: ecs
+
 
   # -----------------------------
   # ECS Cluster
