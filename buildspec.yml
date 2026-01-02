@@ -27,5 +27,5 @@ phases:
 
 artifacts:
   files:
-    - template.yaml
+    - buildspec.yml
     - imageDetail.json
