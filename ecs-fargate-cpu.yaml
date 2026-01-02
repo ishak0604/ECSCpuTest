@@ -16,12 +16,14 @@ Resources:
   # -----------------------------
   # CloudWatch Logs
   # -----------------------------
-  LogConfiguration:
-    LogDriver: awslogs
-    Options:
-      awslogs-group: !Sub /ecs/${AWS::StackName}
-      awslogs-region: !Ref AWS::Region
-      awslogs-stream-prefix: ecs
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      LogGroupName: !Sub /ecs/${AWS::StackName}
+      RetentionInDays: 7
+
 
 
   # -----------------------------
