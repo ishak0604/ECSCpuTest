@@ -19,7 +19,7 @@ Resources:
   ECSCluster:
     Type: AWS::ECS::Cluster
     Properties:
-      ClusterName: cpu-test-cluster-v2
+      ClusterName: cpu-test-cluster-v3
       CapacityProviders:
         - FARGATE
         - FARGATE_SPOT
@@ -118,14 +118,14 @@ Resources:
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
-      Family: ecs-cpu-test
+      Family: ecs-cpu-test-1
       Cpu: "1024"
       Memory: "3072"
       NetworkMode: awsvpc
       RequiresCompatibilities: [FARGATE]
       ExecutionRoleArn: !GetAtt TaskExecutionRole.Arn
       ContainerDefinitions:
-        - Name: cpu-container
+        - Name: cpu-container-1
           Image: !Ref ImageUri
           PortMappings:
             - ContainerPort: 8080
@@ -156,7 +156,7 @@ Resources:
           SecurityGroups:
             - !Ref TaskSecurityGroup
       LoadBalancers:
-        - ContainerName: cpu-container
+        - ContainerName: cpu-container-1
           ContainerPort: 8080
           TargetGroupArn: !Ref TargetGroup
 
