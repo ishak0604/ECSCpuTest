@@ -1,3 +1,11 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Main stack for ECS CPU Test application
+
+Parameters:
+  ImageUri:
+    Type: String
+    Description: ECR Image URI for ECS Task
+
 Resources:
 
   IAMStack:
@@ -45,6 +53,8 @@ Resources:
         TaskDefinitionArn: !GetAtt TaskDefinitionStack.Outputs.TaskDefinitionArn
         TargetGroupArn: !GetAtt NetworkStack.Outputs.TargetGroupArn
         TaskSecurityGroup: !GetAtt NetworkStack.Outputs.TaskSecurityGroup
+        PublicSubnet1: !Ref PublicSubnet1
+        PublicSubnet2: !Ref PublicSubnet2
       DependsOn:
         - NetworkStack
         - TaskDefinitionStack
