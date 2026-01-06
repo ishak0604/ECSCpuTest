@@ -9,6 +9,10 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: networking.yaml
+      Parameters:
+        VpcId: /ecs/dev/vpc-id
+        PublicSubnet1: /ecs/dev/public-subnet-1
+        PublicSubnet2: /ecs/dev/public-subnet-2  
 
   ECRStack:
     Type: AWS::CloudFormation::Stack
@@ -21,8 +25,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: ecs-cluster.yaml
-      Parameters:
-        GitHubConnectionArn: arn:aws:codestar-connections:ap-south-1:140857882741:connection/caa0b323-09d6-4218-b5ec-0103de858b47
+      
 
   TaskDefinitionStack:
     Type: AWS::CloudFormation::Stack
