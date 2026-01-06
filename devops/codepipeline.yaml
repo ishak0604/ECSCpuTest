@@ -144,7 +144,7 @@ Resources:
                 RoleArn: !Ref CloudFormationExecutionRoleArn
                 ParameterOverrides: |
                   {
-                    "ImageUri": "#{BuildOutput.IMAGE_URI}"
+                    "ImageUri": "#{Build.IMAGE_URI}"
                   }
 
 
