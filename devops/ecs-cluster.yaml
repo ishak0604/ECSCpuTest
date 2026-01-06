@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: ECS Cluster and Log Group
+Description: ECS Cluster and CloudWatch Log Group
 
 Resources:
   ECSCluster:
@@ -11,14 +11,21 @@ Resources:
         - Name: containerInsights
           Value: enabled
 
-  LogGroup:
+  ECSLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: !Sub /ecs/cpu-test-${AWS::StackName}
+      LogGroupName: !Sub /ecs/ecs-cpu-test-${AWS::StackName}
       RetentionInDays: 7
 
 Outputs:
   ClusterName:
+    Description: ECS Cluster Name
     Value: !Ref ECSCluster
+    Export:
+      Name: !Sub ${AWS::StackName}-ClusterName
+
   LogGroupName:
-    Value: !Ref LogGroup
+    Description: CloudWatch Log Group Name
+    Value: !Ref ECSLogGroup
+    Export:
+      Name: !Sub ${AWS::StackName}-LogGroupName
