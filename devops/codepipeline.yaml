@@ -118,13 +118,14 @@ Resources:
                 Owner: AWS
                 Provider: CodeBuild
                 Version: "1"
+              Namespace: BuildVars
               InputArtifacts:
                 - Name: SourceOutput
               OutputArtifacts:
                 - Name: BuildOutput
               Configuration:
                 ProjectName: !Ref CodeBuildProject
-                Namespace: BuildVars
+                
 
         # -------- Deploy Stage --------
         - Name: Deploy
