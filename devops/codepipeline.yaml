@@ -47,7 +47,7 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
-                  - codestar-connections:UseConnection
+                  - codeconnections:UseConnection
                 Resource: !Ref GitHubConnectionArn
 
       ManagedPolicyArns:
