@@ -5,7 +5,6 @@ Resources:
   ECSCluster:
     Type: AWS::ECS::Cluster
     Properties:
-      ClusterName: cpu-test-cluster
       CapacityProviders:
         - FARGATE
       ClusterSettings:
@@ -15,7 +14,7 @@ Resources:
   LogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: /ecs/cpu-test
+      LogGroupName: !Sub /ecs/cpu-test-${AWS::StackName}
       RetentionInDays: 7
 
 Outputs:
