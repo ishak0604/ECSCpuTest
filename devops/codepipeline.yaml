@@ -39,8 +39,20 @@ Resources:
             Principal:
               Service: codepipeline.amazonaws.com
             Action: sts:AssumeRole
+
+      Policies:
+        - PolicyName: CodeStarConnectionAccess
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - codestar-connections:UseConnection
+                Resource: !Ref GitHubConnectionArn
+
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AdministratorAccess
+
 
   # -------------------------------------------------
   # CodeBuild Role

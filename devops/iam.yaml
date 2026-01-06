@@ -1,10 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: IAM roles for ECS CloudFormation and CodePipeline deployments
-
-Parameters:
-  GitHubConnectionArn:
-    Type: String
-    Description: CodeStar (GitHub App) connection ARN
+Description: IAM role for ECS CloudFormation deployments
 
 Resources:
 
@@ -31,20 +26,9 @@ Resources:
                   - ssm:GetParameters
                 Resource: arn:aws:ssm:ap-south-1:*:parameter/ecs/dev/*
 
-        # ✅ ADD THIS POLICY FOR CODESTAR
-        - PolicyName: UseCodeStarConnection
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Effect: Allow
-                Action:
-                  - codestar-connections:UseConnection
-                Resource: !Ref GitHubConnectionArn
-
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AdministratorAccess
 
 Outputs:
   CloudFormationExecutionRoleArn:
-    Description: ARN of CloudFormation execution role
     Value: !GetAtt CloudFormationExecutionRole.Arn
