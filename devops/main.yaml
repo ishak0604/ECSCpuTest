@@ -11,12 +11,12 @@ Resources:
   IAMStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: iam.yaml
+      TemplateURL: https://ecs-cpu-artifacts-140857882741.s3.ap-south-1.amazonaws.com/iam.yaml
   
   NetworkStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: networking.yaml
+      TemplateURL: https://ecs-cpu-artifacts-140857882741.s3.ap-south-1.amazonaws.com/networking.yaml
       Parameters:
         VpcId: /ecs/dev/vpc-id
         PublicSubnet1: /ecs/dev/public-subnet-1
@@ -25,20 +25,20 @@ Resources:
   ECRStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ecr.yaml
+      TemplateURL: https://ecs-cpu-artifacts-140857882741.s3.ap-south-1.amazonaws.com/ecr.yaml
       Parameters:
         RepositoryName: ecs-cpu-test    
 
   ECSClusterStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ecs-cluster.yaml
+      TemplateURL: https://ecs-cpu-artifacts-140857882741.s3.ap-south-1.amazonaws.com/ecs-cluster.yaml
       
 
   TaskDefinitionStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: task-definition.yaml
+      TemplateURL: https://ecs-cpu-artifacts-140857882741.s3.ap-south-1.amazonaws.com/task-definition.yaml
       Parameters:
         ImageUri: !Ref ImageUri
         ExecutionRoleArn: !GetAtt IAMStack.Outputs.CloudFormationExecutionRoleArn
@@ -47,7 +47,7 @@ Resources:
   ECSServiceStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ecs-service.yaml
+      TemplateURL: https://ecs-cpu-artifacts-140857882741.s3.ap-south-1.amazonaws.com/ecs-service.yaml
       Parameters:
         ClusterName: !GetAtt ECSClusterStack.Outputs.ClusterName
         TaskDefinitionArn: !GetAtt TaskDefinitionStack.Outputs.TaskDefinitionArn
