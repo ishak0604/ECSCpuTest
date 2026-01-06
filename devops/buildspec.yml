@@ -9,25 +9,19 @@ phases:
   pre_build:
     commands:
       - echo Logging in to Amazon ECR...
-      - aws --version
       - ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
       - IMAGE_URI=$ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:latest
-      - aws ecr get-login-password --region $AWS_DEFAULT_REGION |
-        docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
-
+      - echo $IMAGE_URI
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
   build:
     commands:
-      - echo Build started
+      - echo Building Docker image...
       - docker build -t $IMAGE_URI .
       - docker push $IMAGE_URI
-
-  post_build:
-    commands:
-      - echo "exporting image uri"
-      - printf '{"ImageUri":"%s"}' $IMAGE_URI > imageDetail.json
-
+      - echo "IMAGE_URI=$IMAGE_URI" > image-detail.txt
 
 artifacts:
   files:
-    - imageDetail.json
-    - devops/**/*
+    - image-detail.txt
+  name: BuildOutput
+  # This makes IMAGE_URI available as a CodePipeline variable
