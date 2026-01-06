@@ -1,28 +1,28 @@
-AWSTemplateFormatVersion: "2010-09-09"
-Description: Root Stack
-
-Parameters:
-  ImageUri:
-    Type: String
-
 Resources:
 
   IAMStack:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: iam.yaml
+  
+  NetworkStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: networking.yaml
+
+  ECRStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ecr.yaml
+      Parameters:
+        RepositoryName: ecs-cpu-test    
 
   ECSClusterStack:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: ecs-cluster.yaml
-    Parameters:
-      GitHubConnectionArn: arn:aws:codestar-connections:ap-south-1:140857882741:connection/caa0b323-09d6-4218-b5ec-0103de858b47  
-
-  NetworkStack:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: networking.yaml
+      Parameters:
+        GitHubConnectionArn: arn:aws:codestar-connections:ap-south-1:140857882741:connection/caa0b323-09d6-4218-b5ec-0103de858b47
 
   TaskDefinitionStack:
     Type: AWS::CloudFormation::Stack
@@ -32,7 +32,6 @@ Resources:
         ImageUri: !Ref ImageUri
         ExecutionRoleArn: !GetAtt IAMStack.Outputs.CloudFormationExecutionRoleArn
         LogGroupName: !GetAtt ECSClusterStack.Outputs.LogGroupName
-
 
   ECSServiceStack:
     Type: AWS::CloudFormation::Stack
