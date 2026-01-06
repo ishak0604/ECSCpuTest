@@ -124,6 +124,7 @@ Resources:
                 - Name: BuildOutput
               Configuration:
                 ProjectName: !Ref CodeBuildProject
+                Namespace: BuildVars
 
         # -------- Deploy Stage --------
         - Name: Deploy
@@ -144,7 +145,8 @@ Resources:
                 RoleArn: !Ref CloudFormationExecutionRoleArn
                 ParameterOverrides: |
                   {
-                    "ImageUri": "#{Build.IMAGE_URI}"
+                    "ImageUri": "#{BuildVars.IMAGE_URI}"
+
                   }
 
 
