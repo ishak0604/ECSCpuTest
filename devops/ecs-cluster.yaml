@@ -1,0 +1,25 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: ECS Cluster and Log Group
+
+Resources:
+  ECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: cpu-test-cluster
+      CapacityProviders:
+        - FARGATE
+      ClusterSettings:
+        - Name: containerInsights
+          Value: enabled
+
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /ecs/cpu-test
+      RetentionInDays: 7
+
+Outputs:
+  ClusterName:
+    Value: !Ref ECSCluster
+  LogGroupName:
+    Value: !Ref LogGroup

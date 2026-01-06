@@ -1,0 +1,36 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: ECS Task Definition
+
+Parameters:
+  ImageUri:
+    Type: String
+  ExecutionRoleArn:
+    Type: String
+  LogGroupName:
+    Type: String
+
+Resources:
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: ecs-cpu-test
+      Cpu: "1024"
+      Memory: "3072"
+      NetworkMode: awsvpc
+      RequiresCompatibilities: [FARGATE]
+      ExecutionRoleArn: !Ref ExecutionRoleArn
+      ContainerDefinitions:
+        - Name: cpu-container
+          Image: !Ref ImageUri
+          PortMappings:
+            - ContainerPort: 8080
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref LogGroupName
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: ecs
+
+Outputs:
+  TaskDefinitionArn:
+    Value: !Ref TaskDefinition

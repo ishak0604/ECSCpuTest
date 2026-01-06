@@ -1,0 +1,46 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Root Stack
+
+Parameters:
+  ImageUri:
+    Type: String
+
+Resources:
+
+  IAMStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: iam.yaml
+
+  ECSClusterStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ecs-cluster.yaml
+
+  NetworkStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: networking.yaml
+
+  TaskDefinitionStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: task-definition.yaml
+      Parameters:
+        ImageUri: !Ref ImageUri
+        ExecutionRoleArn: !GetAtt IAMStack.Outputs.CloudFormationExecutionRoleArn
+        LogGroupName: !GetAtt ECSClusterStack.Outputs.LogGroupName
+
+
+  ECSServiceStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ecs-service.yaml
+      Parameters:
+        ClusterName: !GetAtt ECSClusterStack.Outputs.ClusterName
+        TaskDefinitionArn: !GetAtt TaskDefinitionStack.Outputs.TaskDefinitionArn
+        TargetGroupArn: !GetAtt NetworkStack.Outputs.TargetGroupArn
+        TaskSecurityGroup: !GetAtt NetworkStack.Outputs.TaskSecurityGroup
+      DependsOn:
+        - NetworkStack
+        - TaskDefinitionStack
