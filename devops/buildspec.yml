@@ -20,7 +20,8 @@ phases:
   build:
     commands:
       - echo "Building Docker image..."
-      - docker build -t $IMAGE_URI -f docker/Dockerfile ./src
+      - docker build -t $IMAGE_URI -f docker/Dockerfile .
+
 
 
   post_build:
