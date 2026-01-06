@@ -5,6 +5,9 @@ env:
     IMAGE_REPO_NAME: ecs-cpu-test
     AWS_DEFAULT_REGION: ap-south-1
 
+  exported-variables:
+    - IMAGE_URI
+
 phases:
   pre_build:
     commands:
@@ -12,6 +15,7 @@ phases:
       - ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
       - IMAGE_URI=$ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:latest
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+
   build:
     commands:
       - echo Building Docker image...
@@ -20,13 +24,8 @@ phases:
 
   post_build:
     commands:
-      - echo "Exporting IMAGE_URI for CodePipeline"
-      # This is the key step to make it available as a pipeline variable
-      - echo "IMAGE_URI=$IMAGE_URI" >> variables.env
+      - echo "IMAGE_URI=$IMAGE_URI"
 
 artifacts:
   files:
-    - variables.env
-  name: BuildOutput
-  discard-paths: yes
-  # Important: this makes IMAGE_URI available as BuildOutput.IMAGE_URI
+    - '**/*'
