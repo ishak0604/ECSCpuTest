@@ -6,13 +6,13 @@ Resources:
   CloudFormationExecutionRole:
     Type: AWS::IAM::Role
     Properties:
-    AssumeRolePolicyDocument:
-      Version: "2012-10-17"
-      Statement:
-        - Effect: Allow
-          Principal:
-            Service: cloudformation.amazonaws.com
-          Action: sts:AssumeRole
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: cloudformation.amazonaws.com
+            Action: sts:AssumeRole
 
       Policies:
         - PolicyName: SSMReadAccess
