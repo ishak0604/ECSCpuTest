@@ -8,6 +8,9 @@ Parameters:
   ExecutionRoleArn:
     Type: String
 
+  TaskRoleArn:
+    Type: String
+
   LogGroupName:
     Type: String
 
@@ -22,6 +25,7 @@ Resources:
       RequiresCompatibilities:
         - FARGATE
       ExecutionRoleArn: !Ref ExecutionRoleArn
+      TaskRoleArn: !Ref TaskRoleArn
       ContainerDefinitions:
         - Name: cpu-container
           Image: !Ref ImageUri
