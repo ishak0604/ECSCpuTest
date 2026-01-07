@@ -5,6 +5,7 @@ Resources:
   CloudFormationExecutionRole:
     Type: AWS::IAM::Role
     Properties:
+      RoleName: cfn-execution-role
       
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
