@@ -46,6 +46,9 @@ Resources:
 
   ECSServiceStack:
     Type: AWS::CloudFormation::Stack
+    DependsOn:
+      - NetworkStack
+      - TaskDefinitionStack
     Properties:
       TemplateURL: https://ecs-cpu-artifacts-140857882741.s3.ap-south-1.amazonaws.com/ecs-service.yaml
       Parameters:
@@ -55,6 +58,4 @@ Resources:
         TaskSecurityGroup: !GetAtt NetworkStack.Outputs.TaskSecurityGroup
         PublicSubnet1: /ecs/dev/public-subnet-1
         PublicSubnet2: /ecs/dev/public-subnet-2
-      DependsOn:
-        - NetworkStack
-        - TaskDefinitionStack
+      
