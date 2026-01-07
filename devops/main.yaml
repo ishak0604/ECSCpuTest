@@ -6,13 +6,12 @@ Parameters:
     Type: String
     Description: ECR Image URI for ECS Task
 
+  TaskExecutionRoleArn:
+    Type: String
+    Description: ECS Task Execution Role ARN (pre-created)
+
 Resources:
 
-  IAMStack:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: https://ecs-cpu-artifacts-140857882741.s3.ap-south-1.amazonaws.com/iam.yaml
-  
   NetworkStack:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -22,18 +21,10 @@ Resources:
         PublicSubnet1: /ecs/dev/public-subnet-1
         PublicSubnet2: /ecs/dev/public-subnet-2  
 
-  ECRStack:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: https://ecs-cpu-artifacts-140857882741.s3.ap-south-1.amazonaws.com/ecr.yaml
-      Parameters:
-        RepositoryName: ecs-cpu-test    
-
   ECSClusterStack:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: https://ecs-cpu-artifacts-140857882741.s3.ap-south-1.amazonaws.com/ecs-cluster.yaml
-      
 
   TaskDefinitionStack:
     Type: AWS::CloudFormation::Stack
@@ -41,7 +32,7 @@ Resources:
       TemplateURL: https://ecs-cpu-artifacts-140857882741.s3.ap-south-1.amazonaws.com/task-definition.yaml
       Parameters:
         ImageUri: !Ref ImageUri
-        ExecutionRoleArn: !GetAtt IAMStack.Outputs.CloudFormationExecutionRoleArn
+        ExecutionRoleArn: !Ref TaskExecutionRoleArn
         LogGroupName: !GetAtt ECSClusterStack.Outputs.LogGroupName
 
   ECSServiceStack:
@@ -58,4 +49,3 @@ Resources:
         TaskSecurityGroup: !GetAtt NetworkStack.Outputs.TaskSecurityGroup
         PublicSubnet1: /ecs/dev/public-subnet-1
         PublicSubnet2: /ecs/dev/public-subnet-2
-      
