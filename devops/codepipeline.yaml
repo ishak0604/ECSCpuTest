@@ -155,7 +155,7 @@ Resources:
                 StackName: ecs-cpu-test
                 TemplatePath: BuildOutput::devops/main.yaml
                 Capabilities: CAPABILITY_NAMED_IAM
-                RoleArn: !Ref CloudFormationExecutionRoleArn
+                
                 ParameterOverrides: |
                   {
                     "ImageUri": "#{BuildVars.IMAGE_URI}"
