@@ -39,20 +39,24 @@ Resources:
             Principal:
               Service: codepipeline.amazonaws.com
             Action: sts:AssumeRole
-
       Policies:
         - PolicyName: CodeStarConnectionAccess
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
+              # Allow CodePipeline to use CodeStar GitHub connection
               - Effect: Allow
                 Action:
                   - codeconnections:UseConnection
                 Resource: !Ref GitHubConnectionArn
 
+              # Ensure CodePipeline can assume any roles it needs
+              - Effect: Allow
+                Action:
+                  - sts:AssumeRole
+                Resource: "*"
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AdministratorAccess
-
 
   # -------------------------------------------------
   # CodeBuild Role
@@ -98,11 +102,9 @@ Resources:
     Properties:
       Name: ecs-cpu-pipeline
       RoleArn: !GetAtt PipelineRole.Arn
-
       ArtifactStore:
         Type: S3
         Location: !Ref ArtifactBucket
-
       Stages:
 
         # -------- Source Stage --------
@@ -137,7 +139,6 @@ Resources:
                 - Name: BuildOutput
               Configuration:
                 ProjectName: !Ref CodeBuildProject
-                
 
         # -------- Deploy Stage --------
         - Name: Deploy
@@ -155,15 +156,10 @@ Resources:
                 StackName: ecs-cpu-test
                 TemplatePath: BuildOutput::devops/main.yaml
                 Capabilities: CAPABILITY_NAMED_IAM
-                
                 ParameterOverrides: |
                   {
                     "ImageUri": "#{BuildVars.IMAGE_URI}"
-
                   }
-
-
-
 
 Outputs:
   PipelineName:
