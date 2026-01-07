@@ -42,3 +42,12 @@ Resources:
         - ContainerName: cpu-container
           ContainerPort: 8080
           TargetGroupArn: !Ref TargetGroupArn
+
+      PropagateTags: SERVICE
+    
+
+      Tags:
+        - Key: Project
+          Value: ecs-cpu-test
+        - Key: learning
+          Value: "true"    
