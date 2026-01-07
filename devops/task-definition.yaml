@@ -9,12 +9,7 @@ Parameters:
   LogGroupName:
     Type: String
 
-Resources:
-  ECSLogGroup:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: !Ref LogGroupName
-      RetentionInDays: 7
+
 
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
