@@ -1,11 +1,11 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: IAM role for ECS CloudFormation deployments
+Description: IAM execution role for CloudFormation ECS deployments
 
 Resources:
-
   CloudFormationExecutionRole:
     Type: AWS::IAM::Role
     Properties:
+      
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -15,19 +15,93 @@ Resources:
             Action: sts:AssumeRole
 
       Policies:
-        - PolicyName: SSMReadAccess
+        - PolicyName: CloudFormationExecutionPolicy
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
+
+              # SSM Parameters
               - Effect: Allow
                 Action:
                   - ssm:GetParameter
                   - ssm:GetParameters
                 Resource: arn:aws:ssm:ap-south-1:*:parameter/ecs/dev/*
 
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AdministratorAccess
+              # IAM (for ECS task execution roles, etc.)
+              - Effect: Allow
+                Action:
+                  - iam:CreateRole
+                  - iam:DeleteRole
+                  - iam:GetRole
+                  - iam:AttachRolePolicy
+                  - iam:DetachRolePolicy
+                  - iam:PutRolePolicy
+                  - iam:DeleteRolePolicy
+                  - iam:PassRole
+                Resource: "*"
+
+              # ECS
+              - Effect: Allow
+                Action:
+                  - ecs:CreateCluster
+                  - ecs:DeleteCluster
+                  - ecs:RegisterTaskDefinition
+                  - ecs:DeregisterTaskDefinition
+                  - ecs:CreateService
+                  - ecs:UpdateService
+                  - ecs:DeleteService
+                  - ecs:Describe*
+                Resource: "*"
+
+              # ECR
+              - Effect: Allow
+                Action:
+                  - ecr:CreateRepository
+                  - ecr:DeleteRepository
+                  - ecr:DescribeRepositories
+                  - ecr:GetAuthorizationToken
+                Resource: "*"
+
+              # CloudWatch Logs
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:DeleteLogGroup
+                  - logs:DescribeLogGroups
+                Resource: "*"
+
+              # EC2 (Networking & Security Groups)
+              - Effect: Allow
+                Action:
+                  - ec2:CreateSecurityGroup
+                  - ec2:DeleteSecurityGroup
+                  - ec2:AuthorizeSecurityGroupIngress
+                  - ec2:RevokeSecurityGroupIngress
+                  - ec2:Describe*
+                Resource: "*"
+
+              # ALB / ELBv2
+              - Effect: Allow
+                Action:
+                  - elasticloadbalancing:CreateLoadBalancer
+                  - elasticloadbalancing:DeleteLoadBalancer
+                  - elasticloadbalancing:CreateTargetGroup
+                  - elasticloadbalancing:DeleteTargetGroup
+                  - elasticloadbalancing:CreateListener
+                  - elasticloadbalancing:DeleteListener
+                  - elasticloadbalancing:Describe*
+                Resource: "*"
+
+              # Nested stacks
+              - Effect: Allow
+                Action:
+                  - cloudformation:CreateStack
+                  - cloudformation:UpdateStack
+                  - cloudformation:DeleteStack
+                  - cloudformation:DescribeStacks
+                Resource: "*"
 
 Outputs:
   CloudFormationExecutionRoleArn:
+    Description: ARN of CloudFormation execution role
     Value: !GetAtt CloudFormationExecutionRole.Arn
