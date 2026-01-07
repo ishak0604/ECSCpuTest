@@ -4,13 +4,14 @@ Description: ECS Task Definition
 Parameters:
   ImageUri:
     Type: String
+
   ExecutionRoleArn:
-    Type: String   
+    Type: String
+
   LogGroupName:
     Type: String
 
-
-
+Resources:
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
@@ -18,7 +19,8 @@ Parameters:
       Cpu: "1024"
       Memory: "3072"
       NetworkMode: awsvpc
-      RequiresCompatibilities: [FARGATE]
+      RequiresCompatibilities:
+        - FARGATE
       ExecutionRoleArn: !Ref ExecutionRoleArn
       ContainerDefinitions:
         - Name: cpu-container
