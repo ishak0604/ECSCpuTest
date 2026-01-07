@@ -15,6 +15,12 @@ Resources:
               Service: cloudformation.amazonaws.com
             Action: sts:AssumeRole
 
+      Tags:
+        - Key: Project
+          Value: ecs-cpu-test
+        - Key: learning
+          Value: "true"      
+
       Policies:
         - PolicyName: CloudFormationExecutionPolicy
           PolicyDocument:

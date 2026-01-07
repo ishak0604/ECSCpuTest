@@ -11,6 +11,12 @@ Resources:
         - Name: containerInsights
           Value: enabled
 
+      Tags:
+        - Key: Project
+          Value: ecs-cpu-test
+        - Key: learning
+          Value: "true"    
+
   ECSLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
