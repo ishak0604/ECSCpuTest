@@ -5,8 +5,8 @@ Resources:
   CloudFormationExecutionRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: cfn-execution-role
-      
+      RoleName: cfn-ecs-execution-role-v2
+
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -28,7 +28,7 @@ Resources:
                   - ssm:GetParameters
                 Resource: arn:aws:ssm:ap-south-1:*:parameter/ecs/dev/*
 
-              # IAM (for ECS task execution roles, etc.)
+              # IAM
               - Effect: Allow
                 Action:
                   - iam:CreateRole
@@ -71,7 +71,7 @@ Resources:
                   - logs:DescribeLogGroups
                 Resource: "*"
 
-              # EC2 (Networking & Security Groups)
+              # EC2
               - Effect: Allow
                 Action:
                   - ec2:CreateSecurityGroup
@@ -81,7 +81,7 @@ Resources:
                   - ec2:Describe*
                 Resource: "*"
 
-              # ALB / ELBv2
+              # ALB
               - Effect: Allow
                 Action:
                   - elasticloadbalancing:CreateLoadBalancer
