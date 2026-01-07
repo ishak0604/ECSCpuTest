@@ -5,11 +5,17 @@ Parameters:
   ImageUri:
     Type: String
   ExecutionRoleArn:
-    Type: String
+    Type: String   
   LogGroupName:
     Type: String
 
 Resources:
+  ECSLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Ref LogGroupName
+      RetentionInDays: 7
+
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
