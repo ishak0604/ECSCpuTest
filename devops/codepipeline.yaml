@@ -21,13 +21,13 @@ Parameters:
 
   CloudFormationExecutionRoleArn:
     Type: String
-    Description: ARN of CloudFormation execution role (created via iam.yaml)
+    Description: ARN of CloudFormation execution role
 
 Resources:
 
-  # -------------------------------------------------
-  # CodePipeline Role
-  # -------------------------------------------------
+  ##################################
+  # CodePipeline IAM Role
+  ##################################
   PipelineRole:
     Type: AWS::IAM::Role
     Properties:
@@ -39,28 +39,32 @@ Resources:
             Principal:
               Service: codepipeline.amazonaws.com
             Action: sts:AssumeRole
+
       Policies:
-        - PolicyName: CodeStarConnectionAccess
+        - PolicyName: CodeStarConnectionPolicy
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
-              # Allow CodePipeline to use CodeStar GitHub connection
               - Effect: Allow
                 Action:
-                  - codeconnections:UseConnection
+                  - codestar-connections:UseConnection
                 Resource: !Ref GitHubConnectionArn
 
-              # Ensure CodePipeline can assume any roles it needs
+        - PolicyName: AssumeRolesPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
               - Effect: Allow
                 Action:
                   - sts:AssumeRole
                 Resource: "*"
+
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AdministratorAccess
 
-  # -------------------------------------------------
-  # CodeBuild Role
-  # -------------------------------------------------
+  ##################################
+  # CodeBuild IAM Role
+  ##################################
   CodeBuildRole:
     Type: AWS::IAM::Role
     Properties:
@@ -75,9 +79,9 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AdministratorAccess
 
-  # -------------------------------------------------
+  ##################################
   # CodeBuild Project
-  # -------------------------------------------------
+  ##################################
   CodeBuildProject:
     Type: AWS::CodeBuild::Project
     Properties:
@@ -94,9 +98,9 @@ Resources:
         Type: CODEPIPELINE
         BuildSpec: devops/buildspec.yml
 
-  # -------------------------------------------------
+  ##################################
   # CodePipeline
-  # -------------------------------------------------
+  ##################################
   Pipeline:
     Type: AWS::CodePipeline::Pipeline
     Properties:
@@ -105,12 +109,15 @@ Resources:
       ArtifactStore:
         Type: S3
         Location: !Ref ArtifactBucket
+
       Stages:
 
-        # -------- Source Stage --------
+        ##################################
+        # Source Stage
+        ##################################
         - Name: Source
           Actions:
-            - Name: Source
+            - Name: GitHub_Source
               ActionTypeId:
                 Category: Source
                 Owner: AWS
@@ -120,13 +127,16 @@ Resources:
                 ConnectionArn: !Ref GitHubConnectionArn
                 FullRepositoryId: !Ref RepositoryName
                 BranchName: !Ref BranchName
+                DetectChanges: true
               OutputArtifacts:
                 - Name: SourceOutput
 
-        # -------- Build Stage --------
+        ##################################
+        # Build Stage
+        ##################################
         - Name: Build
           Actions:
-            - Name: Build
+            - Name: Docker_Build
               ActionTypeId:
                 Category: Build
                 Owner: AWS
@@ -140,10 +150,12 @@ Resources:
               Configuration:
                 ProjectName: !Ref CodeBuildProject
 
-        # -------- Deploy Stage --------
+        ##################################
+        # Deploy Stage
+        ##################################
         - Name: Deploy
           Actions:
-            - Name: DeployECS
+            - Name: Deploy_ECS
               ActionTypeId:
                 Category: Deploy
                 Owner: AWS
@@ -156,6 +168,7 @@ Resources:
                 StackName: ecs-cpu-test
                 TemplatePath: BuildOutput::devops/main.yaml
                 Capabilities: CAPABILITY_NAMED_IAM
+                RoleArn: !Ref CloudFormationExecutionRoleArn
                 ParameterOverrides: |
                   {
                     "ImageUri": "#{BuildVars.IMAGE_URI}"
