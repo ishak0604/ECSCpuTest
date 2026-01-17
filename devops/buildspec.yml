@@ -4,6 +4,7 @@ env:
   variables:
     IMAGE_REPO_NAME: ecs-cpu-test
     AWS_DEFAULT_REGION: ap-south-1
+    CFN_ARTIFACT_BUCKET: ecs-cpu-artifacts-140857882741
   exported-variables:
     - IMAGE_URI
 
@@ -20,14 +21,17 @@ phases:
       - echo "Building Docker image..."
       - docker build -t $IMAGE_URI -f docker/Dockerfile .
 
-
-
   post_build:
     commands:
       - echo "Pushing Docker image..."
       - docker push $IMAGE_URI
+      - echo "Packaging CloudFormation templates..."
+      - aws cloudformation package \
+          --template-file devops/main.yaml \
+          --s3-bucket $CFN_ARTIFACT_BUCKET \
+          --output-template-file packaged.yaml
       - echo "IMAGE_URI=$IMAGE_URI"
 
 artifacts:
   files:
-    - '**/*'
+    - packaged.yaml
