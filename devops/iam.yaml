@@ -35,7 +35,8 @@ Resources:
                   - iam:PassRole
                 Resource:
                   - arn:aws:iam::*:role/ecsTaskExecutionRole
-                  
+                  - arn:aws:iam::*:role/cfn-ecs-execution-role-v2
+
               # SSM Parameter Store (REQUIRED)
               - Effect: Allow
                 Action:
