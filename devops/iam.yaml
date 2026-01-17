@@ -35,6 +35,17 @@ Resources:
                   - iam:PassRole
                 Resource:
                   - arn:aws:iam::*:role/ecsTaskExecutionRole
+                  
+              # SSM Parameter Store (REQUIRED)
+              - Effect: Allow
+                Action:
+                  - ssm:GetParameter
+                  - ssm:GetParameters
+                  - ssm:GetParameterHistory
+                Resource:
+                  - arn:aws:ssm:ap-south-1:140857882741:parameter/ecs/dev/*
+
+              
 
               # ECS permissions
               - Effect: Allow
