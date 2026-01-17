@@ -49,6 +49,17 @@ Resources:
                   - ecs:Describe*
                 Resource: "*"
 
+              # IAM read permissions (REQUIRED for pipeline updates)
+              - Effect: Allow
+                Action:
+                  - iam:GetRole
+                  - iam:ListRoles
+                  - iam:GetPolicy
+                  - iam:ListAttachedRolePolicies
+                  - iam:GetRolePolicy
+                Resource: "*"
+
+
               # ECR permissions
               - Effect: Allow
                 Action:
