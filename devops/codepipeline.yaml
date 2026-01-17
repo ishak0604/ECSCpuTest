@@ -166,7 +166,7 @@ Resources:
               Configuration:
                 ActionMode: CREATE_UPDATE
                 StackName: ecs-cpu-test
-                TemplatePath: BuildOutput::devops/main.yaml
+                TemplatePath: BuildOutput::main.yaml
                 Capabilities: CAPABILITY_NAMED_IAM
                 RoleArn: !Ref CloudFormationExecutionRoleArn
                 ParameterOverrides: |
