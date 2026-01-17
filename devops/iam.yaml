@@ -70,6 +70,17 @@ Resources:
                   - iam:ListAttachedRolePolicies
                   - iam:GetRolePolicy
                 Resource: "*"
+# S3 access for nested stack templates
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:GetObjectVersion
+                  - s3:ListBucket
+                Resource:
+                  - arn:aws:s3:::ecs-cpu-artifacts-140857882741
+                  - arn:aws:s3:::ecs-cpu-artifacts-140857882741/*
+
+              
 
 
               # ECR permissions
