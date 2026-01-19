@@ -29,6 +29,8 @@ aws cloudformation deploy \
     ImageRepoName="$IMAGE_REPO_NAME" \
     VpcId="$VPC_ID" \
     PublicSubnet1="$PUBLIC_SUBNET1" \
-    PublicSubnet2="$PUBLIC_SUBNET2"
+    PublicSubnet2="$PUBLIC_SUBNET2" \
+    TaskExecutionRoleArn="$TASK_EXECUTION_ROLE_ARN"
+
 
 echo "✅ Pipeline deployed successfully"
