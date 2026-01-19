@@ -252,11 +252,12 @@ Resources:
                 RoleArn: !GetAtt CFNDeployRole.Arn
                 StackName: !Sub ecs-cpu-${Environment}-service
                 TemplatePath: BuildOutput::devops/templates/resources.yaml
-                TemplateConfiguration: BuildOutput::image.json
+                
                 Capabilities: CAPABILITY_NAMED_IAM
                 ParameterOverrides: !Sub |
                   {
                     "Environment": "${Environment}",
+                    "ImageUri": { "Fn::GetParam": ["BuildOutput", "image.json", "ImageUri"] },
                     "VpcId": "${VpcId}",
                     "PublicSubnet1": "${PublicSubnet1}",
                     "PublicSubnet2": "${PublicSubnet2}",
