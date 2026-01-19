@@ -148,10 +148,43 @@ Resources:
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
+
+            # CloudFormation (REQUIRED)
               - Effect: Allow
                 Action:
-                  - "*"
+                  - cloudformation:CreateStack
+                  - cloudformation:UpdateStack
+                  - cloudformation:DeleteStack
+                  - cloudformation:DescribeStacks
+                  - cloudformation:DescribeStackEvents
+                  - cloudformation:GetTemplate
                 Resource: "*"
+
+            # ECS
+              - Effect: Allow
+                Action:
+                  - ecs:*
+                Resource: "*"
+
+            # EC2 / Networking
+              - Effect: Allow
+                Action:
+                  - ec2:*
+                  - elasticloadbalancing:*
+                Resource: "*"
+
+            # IAM (for task execution role)
+              - Effect: Allow
+                Action:
+                  - iam:PassRole
+                Resource: "*"
+
+            # Logs
+              - Effect: Allow
+                Action:
+                  - logs:*
+                Resource: "*"
+
          
 
   ##################################
