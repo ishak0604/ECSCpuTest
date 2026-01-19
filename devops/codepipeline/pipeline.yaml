@@ -271,7 +271,8 @@ Resources:
               Configuration:
                 ActionMode: CREATE_UPDATE
                 RoleArn: !GetAtt CFNDeployRole.Arn
-                StackName: !Sub ecs-cpu-${Environment}
+                StackName: !Sub ecs-cpu-${Environment}-service
+
                 TemplatePath: BuildOutput::devops/templates/resources.yaml
                 Capabilities: CAPABILITY_NAMED_IAM
                 ParameterOverrides: !Sub |
