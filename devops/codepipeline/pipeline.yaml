@@ -31,6 +31,10 @@ Resources:
   CodePipelineManagedPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
+      ManagedPolicyName: ecs-cpu-codepipeline-policy
+      Tags:
+        - Key: Project
+          Value: ecs-cpu
       PolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -43,7 +47,9 @@ Resources:
               - s3:GetObject
               - s3:GetObjectVersion
               - s3:PutObject
-            Resource: !Sub arn:aws:s3:::${ArtifactBucket}/*
+            Resource:
+              - !Sub arn:aws:s3:::${ArtifactBucket}
+              - !Sub arn:aws:s3:::${ArtifactBucket}/*
 
           - Effect: Allow
             Action:
@@ -55,6 +61,7 @@ Resources:
             Action:
               - cloudformation:CreateStack
               - cloudformation:UpdateStack
+              - cloudformation:DeleteStack
               - cloudformation:DescribeStacks
               - cloudformation:DescribeStackEvents
             Resource: "*"
@@ -67,6 +74,9 @@ Resources:
     Type: AWS::IAM::Role
     Properties:
       RoleName: ecs-cpu-codepipeline-role
+      Tags:
+        - Key: Project
+          Value: ecs-cpu
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -83,12 +93,17 @@ Resources:
   CodeBuildManagedPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
+      ManagedPolicyName: ecs-cpu-codebuild-policy
+      Tags:
+        - Key: Project
+          Value: ecs-cpu
       PolicyDocument:
         Version: "2012-10-17"
         Statement:
           - Effect: Allow
             Action:
               - logs:*
+              - ecr:GetAuthorizationToken
               - ecr:*
               - s3:GetObject
               - s3:PutObject
@@ -98,6 +113,9 @@ Resources:
     Type: AWS::IAM::Role
     Properties:
       RoleName: ecs-cpu-codebuild-role
+      Tags:
+        - Key: Project
+          Value: ecs-cpu
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -114,6 +132,10 @@ Resources:
   CFNDeployManagedPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
+      ManagedPolicyName: ecs-cpu-cfn-deploy-policy
+      Tags:
+        - Key: Project
+          Value: ecs-cpu
       PolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -134,6 +156,9 @@ Resources:
     Type: AWS::IAM::Role
     Properties:
       RoleName: ecs-cpu-cfn-deploy-role
+      Tags:
+        - Key: Project
+          Value: ecs-cpu
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -183,7 +208,7 @@ Resources:
 
         - Name: Source
           Actions:
-            - Name: Source
+            - Name: GitHubSource
               ActionTypeId:
                 Category: Source
                 Owner: AWS
