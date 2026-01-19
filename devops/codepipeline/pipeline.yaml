@@ -1,37 +1,29 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: ECS CI/CD Pipeline using CodePipeline, CodeBuild and CloudFormation
+Description: ECS CPU Test CI/CD Pipeline
 
 Parameters:
-  ArtifactBucket:
+  Environment:
     Type: String
-    Description: S3 bucket for CodePipeline artifacts
-
   GitHubConnectionArn:
     Type: String
-    Description: CodeStar connection ARN for GitHub
-
   RepositoryName:
     Type: String
-    Description: GitHub repository in org/repo format
-
   BranchName:
     Type: String
-    Default: main
-    Description: Git branch to trigger the pipeline
-
-  CloudFormationExecutionRoleArn:
+  ArtifactBucket:
     Type: String
-    Description: ARN of CloudFormation execution role
+  ImageRepoName:
+    Type: String
 
 Resources:
 
   ##################################
-  # CodePipeline IAM Role
+  # CodePipeline Role
   ##################################
-  PipelineRole:
+  CodePipelineRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: ecs-codepipeline-role
+      RoleName: ecs-cpu-codepipeline-role
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -39,9 +31,8 @@ Resources:
             Principal:
               Service: codepipeline.amazonaws.com
             Action: sts:AssumeRole
-
       Policies:
-        - PolicyName: CodeStarConnectionPolicy
+        - PolicyName: CodePipelinePolicy
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
@@ -50,25 +41,42 @@ Resources:
                   - codestar-connections:UseConnection
                 Resource: !Ref GitHubConnectionArn
 
-        - PolicyName: AssumeRolesPolicy
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
               - Effect: Allow
                 Action:
-                  - sts:AssumeRole
+                  - s3:GetObject
+                  - s3:GetObjectVersion
+                  - s3:PutObject
+                Resource: !Sub arn:aws:s3:::${ArtifactBucket}/*
+
+              - Effect: Allow
+                Action:
+                  - codebuild:StartBuild
+                  - codebuild:BatchGetBuilds
                 Resource: "*"
 
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AdministratorAccess
+              - Effect: Allow
+                Action:
+                  - cloudformation:CreateStack
+                  - cloudformation:UpdateStack
+                  - cloudformation:DescribeStacks
+                  - cloudformation:GetTemplate
+                Resource: "*"
+
+              - Effect: Allow
+                Action:
+                  - iam:PassRole
+                Resource: "*"
+      Tags:
+        - Key: Project
+          Value: learning
 
   ##################################
-  # CodeBuild IAM Role
+  # CodeBuild Role
   ##################################
   CodeBuildRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: ecs-codebuild-role
+      RoleName: ecs-cpu-codebuild-role
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -76,8 +84,36 @@ Resources:
             Principal:
               Service: codebuild.amazonaws.com
             Action: sts:AssumeRole
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AdministratorAccess
+      Policies:
+        - PolicyName: CodeBuildPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: "*"
+
+              - Effect: Allow
+                Action:
+                  - ecr:GetAuthorizationToken
+                  - ecr:BatchCheckLayerAvailability
+                  - ecr:CompleteLayerUpload
+                  - ecr:UploadLayerPart
+                  - ecr:InitiateLayerUpload
+                  - ecr:PutImage
+                Resource: "*"
+
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                Resource: !Sub arn:aws:s3:::${ArtifactBucket}/*
+      Tags:
+        - Key: Project
+          Value: learning
 
   ##################################
   # CodeBuild Project
@@ -90,13 +126,21 @@ Resources:
       Artifacts:
         Type: CODEPIPELINE
       Environment:
+        Type: LINUX_CONTAINER
         ComputeType: BUILD_GENERAL1_SMALL
         Image: aws/codebuild/standard:7.0
-        Type: LINUX_CONTAINER
         PrivilegedMode: true
+        EnvironmentVariables:
+          - Name: ENV
+            Value: !Ref Environment
+          - Name: IMAGE_REPO_NAME
+            Value: !Ref ImageRepoName
       Source:
         Type: CODEPIPELINE
-        BuildSpec: devops/buildspec.yml
+        BuildSpec: devops/templates/buildspec.yaml
+      Tags:
+        - Key: Project
+          Value: learning
 
   ##################################
   # CodePipeline
@@ -105,19 +149,14 @@ Resources:
     Type: AWS::CodePipeline::Pipeline
     Properties:
       Name: ecs-cpu-pipeline
-      RoleArn: !GetAtt PipelineRole.Arn
+      RoleArn: !GetAtt CodePipelineRole.Arn
       ArtifactStore:
         Type: S3
         Location: !Ref ArtifactBucket
-
       Stages:
-
-        ##################################
-        # Source Stage
-        ##################################
         - Name: Source
           Actions:
-            - Name: GitHub_Source
+            - Name: GitHubSource
               ActionTypeId:
                 Category: Source
                 Owner: AWS
@@ -131,18 +170,14 @@ Resources:
               OutputArtifacts:
                 - Name: SourceOutput
 
-        ##################################
-        # Build Stage
-        ##################################
         - Name: Build
           Actions:
-            - Name: Docker_Build
+            - Name: DockerBuild
               ActionTypeId:
                 Category: Build
                 Owner: AWS
                 Provider: CodeBuild
                 Version: "1"
-              Namespace: BuildVars
               InputArtifacts:
                 - Name: SourceOutput
               OutputArtifacts:
@@ -150,12 +185,9 @@ Resources:
               Configuration:
                 ProjectName: !Ref CodeBuildProject
 
-        ##################################
-        # Deploy Stage
-        ##################################
         - Name: Deploy
           Actions:
-            - Name: Deploy_ECS
+            - Name: ECSDeploy
               ActionTypeId:
                 Category: Deploy
                 Owner: AWS
@@ -165,16 +197,11 @@ Resources:
                 - Name: BuildOutput
               Configuration:
                 ActionMode: CREATE_UPDATE
-                StackName: ecs-cpu-test
-                TemplatePath: BuildOutput::main.yaml
+                StackName: !Sub ecs-cpu-${Environment}
+                TemplatePath: BuildOutput::devops/templates/resources.yaml
                 Capabilities: CAPABILITY_NAMED_IAM
-                RoleArn: !Ref CloudFormationExecutionRoleArn
-                ParameterOverrides: |
+                ParameterOverrides: !Sub |
                   {
-                    "ImageUri": "#{BuildVars.IMAGE_URI}"
+                    "Environment": "${Environment}",
+                    "ImageUri": { "Fn::GetParam": ["BuildOutput", "image.json", "ImageUri"] }
                   }
-
-Outputs:
-  PipelineName:
-    Description: Name of the CodePipeline
-    Value: !Ref Pipeline

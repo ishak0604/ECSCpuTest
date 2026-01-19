@@ -1,0 +1,23 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+      - IMAGE_URI=$ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME-$ENV:latest
+      - aws ecr describe-repositories --repository-names $IMAGE_REPO_NAME-$ENV || aws ecr create-repository --repository-name $IMAGE_REPO_NAME-$ENV
+      - aws ecr get-login-password | docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+
+  build:
+    commands:
+      - docker build -t $IMAGE_URI -f docker/Dockerfile .
+
+  post_build:
+    commands:
+      - docker push $IMAGE_URI
+      - printf '{"ImageUri":"%s"}' "$IMAGE_URI" > image.json
+
+artifacts:
+  files:
+    - devops/templates/resources.yaml
+    - image.json

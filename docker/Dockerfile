@@ -1,15 +1,17 @@
 FROM public.ecr.aws/docker/library/python:3.11-slim
 
+ENV PYTHONUNBUFFERED=1
+
 WORKDIR /app
 
-# Copy requirements.txt from root
 COPY requirements.txt .
 
-# Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy source code
-COPY src/app.py .
+COPY src/ .
+
+RUN useradd -m appuser
+USER appuser
 
 EXPOSE 8080
 
