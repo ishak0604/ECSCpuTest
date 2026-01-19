@@ -15,7 +15,13 @@ phases:
   post_build:
     commands:
       - docker push $IMAGE_URI
-      - printf '{"ImageUri":"%s"}' "$IMAGE_URI" > image.json
+      - |
+        cat <<EOF > image.json
+        {
+          "ImageUri": "$IMAGE_URI"
+        }
+        EOF
+
 
 artifacts:
   files:

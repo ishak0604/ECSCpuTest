@@ -254,12 +254,12 @@ Resources:
                 TemplatePath: BuildOutput::devops/templates/resources.yaml
                 
                 Capabilities: CAPABILITY_NAMED_IAM
-                ParameterOverrides: !Sub |
+                ParameterOverrides: >
                   {
-                    "Environment": "${Environment}",
-                    "ImageUri": { "Fn::GetParam": ["BuildOutput", "image.json", "ImageUri"] },
-                    "VpcId": "${VpcId}",
-                    "PublicSubnet1": "${PublicSubnet1}",
-                    "PublicSubnet2": "${PublicSubnet2}",
-                    "TaskExecutionRoleArn": "${TaskExecutionRoleArn}"
+                    "Environment": "#{Environment}",
+                    "ImageUri": "#{BuildOutput.image.json:ImageUri}",
+                    "VpcId": "#{VpcId}",
+                    "PublicSubnet1": "#{PublicSubnet1}",
+                    "PublicSubnet2": "#{PublicSubnet2}",
+                    "TaskExecutionRoleArn": "#{TaskExecutionRoleArn}"
                   }

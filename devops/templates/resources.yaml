@@ -123,3 +123,7 @@ Resources:
         - ContainerName: cpu
           ContainerPort: 8080
           TargetGroupArn: !Ref TargetGroup
+
+      Tags:
+        - Key: Project
+          Value: learning
