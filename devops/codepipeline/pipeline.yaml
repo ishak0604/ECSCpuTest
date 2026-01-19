@@ -269,7 +269,8 @@ Resources:
               InputArtifacts:
                 - Name: BuildOutput
               Configuration:
-                ActionMode: CREATE_UPDATE
+                ActionMode: REPLACE_ON_FAILURE
+
                 RoleArn: !GetAtt CFNDeployRole.Arn
                 StackName: !Sub ecs-cpu-${Environment}-service
 
