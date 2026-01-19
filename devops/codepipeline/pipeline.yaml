@@ -31,7 +31,6 @@ Resources:
   CodePipelineManagedPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
-      ManagedPolicyName: ecs-cpu-codepipeline-policy
       PolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -93,7 +92,6 @@ Resources:
   CodeBuildManagedPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
-      ManagedPolicyName: ecs-cpu-codebuild-policy
       PolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -153,7 +151,6 @@ Resources:
   CFNDeployManagedPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
-      ManagedPolicyName: ecs-cpu-cfn-deploy-policy
       PolicyDocument:
         Version: "2012-10-17"
         Statement:
