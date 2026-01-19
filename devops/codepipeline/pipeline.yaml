@@ -89,6 +89,8 @@ Resources:
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
+
+              # CloudWatch Logs
               - Effect: Allow
                 Action:
                   - logs:CreateLogGroup
@@ -96,20 +98,25 @@ Resources:
                   - logs:PutLogEvents
                 Resource: "*"
 
+              # ECR permissions (minimal + required)
               - Effect: Allow
                 Action:
                   - ecr:GetAuthorizationToken
                   - ecr:BatchCheckLayerAvailability
-                  - ecr:CompleteLayerUpload
-                  - ecr:UploadLayerPart
+                  - ecr:GetDownloadUrlForLayer
+                  - ecr:BatchGetImage
                   - ecr:InitiateLayerUpload
+                  - ecr:UploadLayerPart
+                  - ecr:CompleteLayerUpload
                   - ecr:PutImage
+                  - ecr:DescribeRepositories
+                  - ecr:CreateRepository
                 Resource: "*"
 
+              # Read source artifact from S3
               - Effect: Allow
                 Action:
                   - s3:GetObject
-                  - s3:PutObject
                 Resource: !Sub arn:aws:s3:::${ArtifactBucket}/*
       Tags:
         - Key: Project
@@ -154,6 +161,7 @@ Resources:
         Type: S3
         Location: !Ref ArtifactBucket
       Stages:
+
         - Name: Source
           Actions:
             - Name: GitHubSource
